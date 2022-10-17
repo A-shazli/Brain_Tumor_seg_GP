@@ -23,8 +23,8 @@ class Logic(QtWidgets.QMainWindow):
         path = self.ui.PathEdit.text()
         input_image = nib.load(path) # access data as numpy array to be able to plot
         self.input_image_data = input_image.get_fdata()
-        self.input_image_data = (self.input_image_data * 255).astype('uint64')
-        leN = len(self.input_image_data) - 1
+        print(input_image.ndim)
+        leN = self.input_image_data.shape[2] -1 #to avoid going out of bounds
         self.ui.AxialSlider.setMaximum(leN)
         self.ui.SagittalSlider.setMaximum(leN)
         self.ui.CoronalSlider.setMaximum(leN)
@@ -35,7 +35,7 @@ class Logic(QtWidgets.QMainWindow):
 
         self.images = []
         print("here1")
-        for i in range(len(self.input_image_data)):
+        for i in range(self.input_image_data.shape[2]): #gets the number of slices to iterate
 
             im_sag = self.ui.axes1.imshow(self.input_image_data[i, :, :], animated=True)
             self.images.append([im_sag])
@@ -43,14 +43,14 @@ class Logic(QtWidgets.QMainWindow):
 
             im_cor = self.ui.axes2.imshow(self.input_image_data[:, i, :] , animated=True)
             self.images.append([im_cor])
-
-
+            #
+            #
             im_ax = self.ui.axes3.imshow(self.input_image_data[:, :, i], animated=True)
             self.images.append([im_ax])
 
         self.ani = animate.ArtistAnimation(self.ui.figure1, self.images, interval=25, \
                                            blit=True, repeat_delay=500)
-
+        print("here2")
         self.ui.canvas.draw()
 
 
