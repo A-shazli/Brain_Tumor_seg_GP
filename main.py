@@ -1,0 +1,89 @@
+from PyQt5 import QtCore, QtGui, QtWidgets
+from gui import Ui_MainWindow
+import matplotlib.pyplot as plt
+import matplotlib
+import nibabel as nib
+import numpy as np
+import matplotlib.animation as animate
+matplotlib.use('Qt5Agg')
+from PyQt5.QtGui import QMovie
+class Logic(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(Logic, self).__init__()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+
+        self.ui.Open.triggered.connect(self.load)
+        self.ui.AxialSlider.valueChanged.connect(self.display_slice)
+        self.ui.CoronalSlider.valueChanged.connect(self.display_slice)
+        self.ui.SagittalSlider.valueChanged.connect(self.display_slice)
+
+
+    def load(self):
+        path = self.ui.PathEdit.text()
+        input_image = nib.load(path) # access data as numpy array to be able to plot
+        self.input_image_data = input_image.get_fdata()
+        self.input_image_data = (self.input_image_data * 255).astype('uint64')
+        leN = len(self.input_image_data) - 1
+        self.ui.AxialSlider.setMaximum(leN)
+        self.ui.SagittalSlider.setMaximum(leN)
+        self.ui.CoronalSlider.setMaximum(leN)
+        self.create_gif()
+        self.display_slice()
+
+    def create_gif(self):
+
+        self.images = []
+        print("here1")
+        for i in range(len(self.input_image_data)):
+
+            im_sag = self.ui.axes1.imshow(self.input_image_data[i, :, :], animated=True)
+            self.images.append([im_sag])
+
+
+            im_cor = self.ui.axes2.imshow(self.input_image_data[:, i, :] , animated=True)
+            self.images.append([im_cor])
+
+
+            im_ax = self.ui.axes3.imshow(self.input_image_data[:, :, i], animated=True)
+            self.images.append([im_ax])
+
+        self.ani = animate.ArtistAnimation(self.ui.figure1, self.images, interval=25, \
+                                           blit=True, repeat_delay=500)
+
+        self.ui.canvas.draw()
+
+
+        # plt.title(title, fontsize=20)
+        #plt.axis('off')
+        # ani.save("test.gif")
+        # self.movie = QMovie("test.gif")
+        # self.ui.label.setMovie(self.movie)
+        # self.movie.start()
+        # plt.show()
+
+
+    def display_slice(self):
+
+        self.ui.axes.clear()
+        self.ui.axes.axis("off")
+        self.ui.axes.imshow(self.input_image_data[:, :, self.ui.AxialSlider.value()], cmap=plt.cm.gray)
+        self.ui.canvas3.draw()
+
+        self.ui.axes_cor.clear()
+        self.ui.axes_cor.axis("off")
+        self.ui.axes_cor.imshow(self.input_image_data[:, self.ui.CoronalSlider.value(), :], cmap=plt.cm.gray)
+        self.ui.canvas1.draw()
+
+        self.ui.axes_sag.clear()
+        self.ui.axes_sag.axis("off")
+        self.ui.axes_sag.imshow(self.input_image_data[self.ui.SagittalSlider.value(), :, :], cmap=plt.cm.gray)
+        self.ui.canvas2.draw()
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    logic = Logic()
+    logic.show()
+    sys.exit(app.exec_())
