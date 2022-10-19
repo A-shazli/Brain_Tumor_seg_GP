@@ -1,4 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
+
 from gui import Ui_MainWindow
 import matplotlib.pyplot as plt
 import matplotlib
@@ -20,16 +22,24 @@ class Logic(QtWidgets.QMainWindow):
 
 
     def load(self):
-        path = self.ui.PathEdit.text()
-        input_image = nib.load(path) # access data as numpy array to be able to plot
-        self.input_image_data = input_image.get_fdata()
-        print(input_image.ndim)
-        leN = self.input_image_data.shape[2] -1 #to avoid going out of bounds
-        self.ui.AxialSlider.setMaximum(leN)
-        self.ui.SagittalSlider.setMaximum(leN)
-        self.ui.CoronalSlider.setMaximum(leN)
-        self.create_gif()
-        self.display_slice()
+        path,format  = QtWidgets.QFileDialog.getOpenFileName(None, "Load Data", "")
+        format = path.split('.')
+
+        if path == "":
+           pass
+        else:
+            if format[1] != "nii":
+                self.show_popup("Not a nifti file", 'Please upload a compatible file')
+            else:
+                input_image = nib.load(path) # access data as numpy array to be able to plot
+                self.input_image_data = input_image.get_fdata()
+                print(input_image.ndim)
+                leN = self.input_image_data.shape[2] -1 #to avoid going out of bounds
+                self.ui.AxialSlider.setMaximum(leN)
+                self.ui.SagittalSlider.setMaximum(leN)
+                self.ui.CoronalSlider.setMaximum(leN)
+                self.create_gif()
+                self.display_slice()
 
     def create_gif(self):
 
@@ -53,14 +63,15 @@ class Logic(QtWidgets.QMainWindow):
         print("here2")
         self.ui.canvas.draw()
 
-
-        # plt.title(title, fontsize=20)
-        #plt.axis('off')
-        # ani.save("test.gif")
-        # self.movie = QMovie("test.gif")
-        # self.ui.label.setMovie(self.movie)
-        # self.movie.start()
-        # plt.show()
+    def show_popup(self, message, information):
+        msg = QMessageBox()
+        msg.setWindowTitle("Message")
+        msg.setText(message)
+        msg.setIcon(QMessageBox.Warning)
+        msg.setStandardButtons(QMessageBox.Ok)
+        msg.setDefaultButton(QMessageBox.Ok)
+        msg.setInformativeText(information)
+        msg.exec_()
 
 
     def display_slice(self):

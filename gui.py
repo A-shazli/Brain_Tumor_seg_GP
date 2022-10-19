@@ -539,9 +539,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
         self.verticalLayout_4 = QtWidgets.QVBoxLayout()
         self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.PathEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.PathEdit.setObjectName("PathEdit")
-        self.verticalLayout_4.addWidget(self.PathEdit)
+
 
         self.figure1 = Figure()
         self.axes1 = self.figure1.add_subplot(1, 3, 1)
@@ -636,18 +634,9 @@ class Ui_MainWindow(object):
         self.File.setTitle(_translate("MainWindow", "File"))
         self.Open.setText(_translate("MainWindow", "Open"))
         self.labelAxial.setText(_translate("MainWindow", "AxialView"))
-        self.label.setText(_translate("MainWindow", "TextLabel"))
+        self.label.setText(_translate("MainWindow", "GIF"))
         self.labelCoronal.setText(_translate("MainWindow", "CoronalView"))
         self.labelSagittal.setText(_translate("MainWindow", "SagittalView"))
 
 
 
-# if __name__ == "__main__":
-#     import sys
-#
-#     app = QtWidgets.QApplication(sys.argv)
-#     MainWindow = QtWidgets.QMainWindow()
-#     ui = Ui_MainWindow()
-#     ui.setupUi(MainWindow)
-#     MainWindow.show()
-#     sys.exit(app.exec_())
