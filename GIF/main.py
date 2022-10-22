@@ -1,14 +1,14 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
-
+from imutils import rotate as rot
 from gui import Ui_MainWindow
 import matplotlib.pyplot as plt
 import matplotlib
 import nibabel as nib
-import numpy as np
 import matplotlib.animation as animate
 matplotlib.use('Qt5Agg')
-from PyQt5.QtGui import QMovie
+#matplotlib.pyplot.subplots_adjust(left=0.1, bottom=None, right=0.2, top=None, wspace=1, hspace=1)
+
 class Logic(QtWidgets.QMainWindow):
     def __init__(self):
         super(Logic, self).__init__()
@@ -47,15 +47,15 @@ class Logic(QtWidgets.QMainWindow):
         print("here1")
         for i in range(self.input_image_data.shape[2]): #gets the number of slices to iterate
 
-            im_sag = self.ui.axes1.imshow(self.input_image_data[i, :, :], animated=True)
+            im_sag = self.ui.axes1.imshow(rot(self.input_image_data[i, :, :], angle=90), animated=True, cmap=plt.cm.gray)
             self.images.append([im_sag])
 
 
-            im_cor = self.ui.axes2.imshow(self.input_image_data[:, i, :] , animated=True)
+            im_cor = self.ui.axes2.imshow(rot(self.input_image_data[:, i, :], angle=90) , animated=True, cmap=plt.cm.gray)
             self.images.append([im_cor])
             #
             #
-            im_ax = self.ui.axes3.imshow(self.input_image_data[:, :, i], animated=True)
+            im_ax = self.ui.axes3.imshow(rot(self.input_image_data[:, :, i], angle=90), animated=True, cmap=plt.cm.gray)
             self.images.append([im_ax])
 
         self.ani = animate.ArtistAnimation(self.ui.figure1, self.images, interval=25, \
@@ -78,23 +78,26 @@ class Logic(QtWidgets.QMainWindow):
 
         self.ui.axes.clear()
         self.ui.axes.axis("off")
-        self.ui.axes.imshow(self.input_image_data[:, :, self.ui.AxialSlider.value()], cmap=plt.cm.gray)
+        self.ui.axes.imshow(rot(self.input_image_data[:, :, self.ui.AxialSlider.value()],angle=90), cmap=plt.cm.gray)
         self.ui.canvas3.draw()
 
         self.ui.axes_cor.clear()
         self.ui.axes_cor.axis("off")
-        self.ui.axes_cor.imshow(self.input_image_data[:, self.ui.CoronalSlider.value(), :], cmap=plt.cm.gray)
+        self.ui.axes_cor.imshow(rot(self.input_image_data[:, self.ui.CoronalSlider.value(), :],angle=90), cmap=plt.cm.gray)
         self.ui.canvas1.draw()
 
         self.ui.axes_sag.clear()
         self.ui.axes_sag.axis("off")
-        self.ui.axes_sag.imshow(self.input_image_data[self.ui.SagittalSlider.value(), :, :], cmap=plt.cm.gray)
+        self.ui.axes_sag.imshow(rot(self.input_image_data[self.ui.SagittalSlider.value(), :, :],angle=90), cmap=plt.cm.gray)
         self.ui.canvas2.draw()
 
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
+    style = "style.stylesheet"
+    fh = open(style).read()
+    app.setStyleSheet(fh)
     logic = Logic()
     logic.show()
     sys.exit(app.exec_())
