@@ -32,6 +32,8 @@ class Logic(QtWidgets.QMainWindow):
                 self.show_popup("Not a nifti file", 'Please upload a compatible file')
             else:
                 input_image = nib.load(path) # access data as numpy array to be able to plot
+                input_seg = nib.load("C:\\Users\\bedox\\Desktop\\DATA SETS\\Brats2021\\BraTS2021_00495_seg.nii.gz")
+                self.input_seg_data = input_seg.get_fdata()
                 self.input_image_data = input_image.get_fdata()
                 print(input_image.ndim)
                 leN = self.input_image_data.shape[2] -1 #to avoid going out of bounds
@@ -44,23 +46,34 @@ class Logic(QtWidgets.QMainWindow):
     def create_gif(self):
 
         self.images = []
+        self.images_seg = []
         print("here1")
         for i in range(self.input_image_data.shape[2]): #gets the number of slices to iterate
 
             im_sag = self.ui.axes1.imshow(rot(self.input_image_data[i, :, :], angle=90), animated=True, cmap=plt.cm.gray)
+            im_sag_seg = self.ui.axes1.imshow(rot(self.input_seg_data[i, :, :], angle=90), animated=True,
+                                          cmap=plt.cm.gray)
             self.images.append([im_sag])
+            self.images_seg.append([im_sag_seg])
 
 
             im_cor = self.ui.axes2.imshow(rot(self.input_image_data[:, i, :], angle=90) , animated=True, cmap=plt.cm.gray)
+            im_cor_seg = self.ui.axes2.imshow(rot(self.input_seg_data[:, i, :], angle=90), animated=True,
+                                              cmap=plt.cm.gray)
             self.images.append([im_cor])
+            self.images_seg.append([im_cor_seg])
             #
             #
             im_ax = self.ui.axes3.imshow(rot(self.input_image_data[:, :, i], angle=90), animated=True, cmap=plt.cm.gray)
+            im_ax_seg = self.ui.axes3.imshow(rot(self.input_seg_data[:, :, i], angle=90), animated=True, cmap=plt.cm.gray)
             self.images.append([im_ax])
+            self.images_seg.append([im_ax_seg])
 
-        self.ani = animate.ArtistAnimation(self.ui.figure1, self.images, interval=25, \
+        self.ani = animate.ArtistAnimation(self.ui.figure1, self.images, interval=5, \
                                            blit=True, repeat_delay=500)
-        print("here2")
+        self.ani1 = animate.ArtistAnimation(self.ui.figure1, self.images_seg, interval=5, \
+                                           blit=True, repeat_delay=500)
+
         self.ui.canvas.draw()
 
     def show_popup(self, message, information):
