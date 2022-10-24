@@ -1,3 +1,6 @@
+import os
+import cv2
+import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from imutils import rotate as rot
@@ -5,7 +8,9 @@ from gui import Ui_MainWindow
 import matplotlib.pyplot as plt
 import matplotlib
 import nibabel as nib
+from nilearn import masking
 import matplotlib.animation as animate
+from segmentation_mask_overlay import overlay_masks
 matplotlib.use('Qt5Agg')
 #matplotlib.pyplot.subplots_adjust(left=0.1, bottom=None, right=0.2, top=None, wspace=1, hspace=1)
 
@@ -24,7 +29,9 @@ class Logic(QtWidgets.QMainWindow):
     def load(self):
         path,format  = QtWidgets.QFileDialog.getOpenFileName(None, "Load Data", "")
         format = path.split('.')
-
+        print(path)
+        print("-------------------")
+        self.gif_img_mask(path)
         if path == "":
            pass
         else:
@@ -32,8 +39,9 @@ class Logic(QtWidgets.QMainWindow):
                 self.show_popup("Not a nifti file", 'Please upload a compatible file')
             else:
                 input_image = nib.load(path) # access data as numpy array to be able to plot
+                input_seg = nib.load("C:\\Users\\bedox\\Desktop\\DATA SETS\\Brats2021\\BraTS2021_00495_seg.nii.gz")
                 self.input_image_data = input_image.get_fdata()
-                print(input_image.ndim)
+                self.input_seg = input_seg.get_fdata()
                 leN = self.input_image_data.shape[2] -1 #to avoid going out of bounds
                 self.ui.AxialSlider.setMaximum(leN)
                 self.ui.SagittalSlider.setMaximum(leN)
@@ -44,24 +52,48 @@ class Logic(QtWidgets.QMainWindow):
     def create_gif(self):
 
         self.images = []
-        print("here1")
+
         for i in range(self.input_image_data.shape[2]): #gets the number of slices to iterate
 
-            im_sag = self.ui.axes1.imshow(rot(self.input_image_data[i, :, :], angle=90), animated=True, cmap=plt.cm.gray)
+            im_sag = self.ui.axes1.imshow(rot(self.apply_mask(self.input_image_data[i, :, :], self.input_seg[i, :, :]), angle=90), animated=True , cmap=plt.cm.gray)
+
             self.images.append([im_sag])
 
 
-            im_cor = self.ui.axes2.imshow(rot(self.input_image_data[:, i, :], angle=90) , animated=True, cmap=plt.cm.gray)
+
+            im_cor = self.ui.axes2.imshow(rot(self.apply_mask(self.input_image_data[:, i, :], self.input_seg[:, i, :]), angle=90), animated=True, cmap=plt.cm.gray)
+
             self.images.append([im_cor])
+
             #
             #
-            im_ax = self.ui.axes3.imshow(rot(self.input_image_data[:, :, i], angle=90), animated=True, cmap=plt.cm.gray)
+            im_ax = self.ui.axes3.imshow(rot(self.apply_mask(self.input_image_data[:, :, i], self.input_seg[:, :, i]), angle=90), animated=True, cmap=plt.cm.gray)
+
             self.images.append([im_ax])
 
-        self.ani = animate.ArtistAnimation(self.ui.figure1, self.images, interval=25, \
-                                           blit=True, repeat_delay=500)
-        print("here2")
+
+        self.ani = animate.ArtistAnimation(self.ui.figure1, self.images, interval=10, \
+                                           blit=True, repeat_delay=250)
+
         self.ui.canvas.draw()
+        # self.ani.save("Gif_seg?") this is not working for some reason (used to work before)
+
+
+    def apply_mask(self, image, mask):
+
+        #was trying something
+        # part = cv2.bitwise_or(image, mask)
+        # masked = cv2.bitwise_xor(part, mask)
+        #image + masked * n
+
+        # n = 4
+
+        _, mask_th = cv2.threshold(mask, 0, 255, cv2.THRESH_BINARY)
+        part = cv2.bitwise_xor(image, mask_th)
+
+
+        return part + mask_th
+
 
     def show_popup(self, message, information):
         msg = QMessageBox()
@@ -90,6 +122,21 @@ class Logic(QtWidgets.QMainWindow):
         self.ui.axes_sag.axis("off")
         self.ui.axes_sag.imshow(rot(self.input_image_data[self.ui.SagittalSlider.value(), :, :],angle=90), cmap=plt.cm.gray)
         self.ui.canvas2.draw()
+
+    #later will be used to traverse a folder of data
+    def gif_img_mask(self, path):
+        pa = ""
+        seg = []
+        path = path.split("/")
+        print(path)
+        for p in range(len(path) -1):
+            pa += path[p] + "/"
+        pa = pa[:-1]
+        print(pa)
+
+        for subdir, dirs, files in os.walk(pa):
+            for file in files:
+                print(os.path.join(subdir, file))
 
 
 if __name__ == "__main__":
