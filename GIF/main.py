@@ -5,10 +5,13 @@ from gui import Ui_MainWindow
 import matplotlib.pyplot as plt
 import matplotlib
 import nibabel as nib
+import imageio
+import numpy as np
 import matplotlib.animation as animate
 matplotlib.use('Qt5Agg')
-#matplotlib.pyplot.subplots_adjust(left=0.1, bottom=None, right=0.2, top=None, wspace=1, hspace=1)
-
+import matplotlib as mpl
+mpl.rcParams['animation.ffmpeg_path'] = r'C:\Users\bedox\Desktop\ffmpeg-2022-10-27-git-00b03331a0-essentials_build\bin\ffmpeg.exe'
+import ffmpeg
 class Logic(QtWidgets.QMainWindow):
     def __init__(self):
         super(Logic, self).__init__()
@@ -19,7 +22,7 @@ class Logic(QtWidgets.QMainWindow):
         self.ui.AxialSlider.valueChanged.connect(self.display_slice)
         self.ui.CoronalSlider.valueChanged.connect(self.display_slice)
         self.ui.SagittalSlider.valueChanged.connect(self.display_slice)
-
+        self.ui.opacity_slider.valueChanged.connect(self.create_gif)
 
     def load(self):
         path,format  = QtWidgets.QFileDialog.getOpenFileName(None, "Load Data", "")
@@ -46,33 +49,29 @@ class Logic(QtWidgets.QMainWindow):
     def create_gif(self):
 
         self.images = []
-        self.images_seg = []
+
         print("here1")
         for i in range(self.input_image_data.shape[2]): #gets the number of slices to iterate
 
-            im_sag = self.ui.axes1.imshow(rot(self.input_image_data[i, :, :], angle=90), animated=True, cmap=plt.cm.gray)
-            im_sag_seg = self.ui.axes1.imshow(rot(self.input_seg_data[i, :, :], angle=90), animated=True,
-                                          cmap=plt.cm.gray)
+            im_sag = self.ui.axes1.imshow(rot(self.concate(self.input_image_data[i, :, :], self.input_seg_data[i, :, :], self.ui.opacity_slider.value()), angle=90), animated=True, cmap=plt.cm.gray)
             self.images.append([im_sag])
-            self.images_seg.append([im_sag_seg])
 
 
-            im_cor = self.ui.axes2.imshow(rot(self.input_image_data[:, i, :], angle=90) , animated=True, cmap=plt.cm.gray)
-            im_cor_seg = self.ui.axes2.imshow(rot(self.input_seg_data[:, i, :], angle=90), animated=True,
-                                              cmap=plt.cm.gray)
+            im_cor = self.ui.axes2.imshow(rot(self.concate(self.input_image_data[:, i, :], self.input_seg_data[:, i, :]), angle=90) , animated=True, cmap=plt.cm.gray, alpha=0.6)
             self.images.append([im_cor])
-            self.images_seg.append([im_cor_seg])
-            #
-            #
-            im_ax = self.ui.axes3.imshow(rot(self.input_image_data[:, :, i], angle=90), animated=True, cmap=plt.cm.gray)
-            im_ax_seg = self.ui.axes3.imshow(rot(self.input_seg_data[:, :, i], angle=90), animated=True, cmap=plt.cm.gray)
-            self.images.append([im_ax])
-            self.images_seg.append([im_ax_seg])
 
-        self.ani = animate.ArtistAnimation(self.ui.figure1, self.images, interval=5, \
+            im_ax = self.ui.axes3.imshow(rot(self.concate(self.input_image_data[:, :, i], self.input_seg_data[:, :, i]), angle=90), animated=True, cmap=plt.cm.gray, alpha=0.6)
+            self.images.append([im_ax])
+
+
+
+
+
+        self.ani = animate.ArtistAnimation(self.ui.figure1, self.images, interval=12, \
                                            blit=True, repeat_delay=500)
-        self.ani1 = animate.ArtistAnimation(self.ui.figure1, self.images_seg, interval=5, \
-                                           blit=True, repeat_delay=500)
+
+        # writergif = animate.FFMpegWriter(fps=50)
+        # self.ani.save("ww.gif", writer=writergif)
 
         self.ui.canvas.draw()
 
@@ -85,6 +84,14 @@ class Logic(QtWidgets.QMainWindow):
         msg.setDefaultButton(QMessageBox.Ok)
         msg.setInformativeText(information)
         msg.exec_()
+
+
+    def concate(self, image, seg):
+
+        mult = image * (seg * opacity)
+        masked = image + mult
+
+        return masked
 
 
     def display_slice(self):

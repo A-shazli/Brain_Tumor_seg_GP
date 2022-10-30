@@ -60,6 +60,10 @@ class Ui_MainWindow(object):
         self.axes3.axis("off")
         self.canvas = FigureCanvas(self.figure1)
         self.canvas.setStyleSheet("background-color: rgb(239, 239, 239);")
+        self.opacity_slider = QtWidgets.QSlider(self.centralwidget)
+        self.opacity_slider.setOrientation(QtCore.Qt.Horizontal)
+        self.opacity_slider.setObjectName("opacity_slider")
+        self.verticalLayout_4.addWidget(self.opacity_slider)
         self.verticalLayout_4.addWidget(self.canvas)
 
         self.label = QtWidgets.QLabel(self.centralwidget)
