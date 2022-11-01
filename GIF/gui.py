@@ -50,7 +50,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setObjectName("verticalLayout_4")
 
 
-        self.figure1 = Figure(  )
+        self.figure1 = Figure()
         self.axes1 = self.figure1.add_subplot(1, 3, 1)
         self.axes2 = self.figure1.add_subplot(1, 3, 2)
         self.axes3 = self.figure1.add_subplot(1, 3, 3)
@@ -64,6 +64,8 @@ class Ui_MainWindow(object):
         self.opacity_slider.setOrientation(QtCore.Qt.Horizontal)
         self.opacity_slider.setObjectName("opacity_slider")
         self.verticalLayout_4.addWidget(self.opacity_slider)
+        self.opacity_slider.setMaximum(10)
+
         self.verticalLayout_4.addWidget(self.canvas)
 
         self.label = QtWidgets.QLabel(self.centralwidget)
