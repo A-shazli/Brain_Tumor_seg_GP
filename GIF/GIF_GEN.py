@@ -12,7 +12,7 @@ def concate_2(image, seg):
     #
     # masked = image + mult
     # mult = cv2.bitwise_or(image, seg)
-    return image + seg*0.5
+    return image + seg
 
 
 
@@ -37,15 +37,13 @@ for img in range(len(t2_list)):
     temp_seg = nib.load(mask_list[img]).get_fdata()
     for i in range(temp_img.shape[2]):
         im1 = ax1.imshow(rot(concate_2(temp_img[:, :, i], temp_seg[:, :, i]), angle=90),  animated=True, cmap='gray' )
-        gif.append([im1])
         im2 = ax2.imshow(rot(concate_2(temp_img[:, i, :], temp_seg[:, i, :]), angle=90), animated=True, cmap='gray')
-        gif.append([im2])
         im3 = ax3.imshow(rot(concate_2(temp_img[i, :, :], temp_seg[i, :, :]), angle=90), animated=True, cmap='gray')
-        gif.append([im3])
-    ani2 = animate.ArtistAnimation(fig, gif, interval=15, \
+        gif.append([im1, im2, im3])
+    ani2 = animate.ArtistAnimation(fig, gif, interval=50, \
                                   blit=True, repeat_delay=500)
-    writermov = animate.FFMpegWriter(fps=60)
-    ani2.save("C:\\Users\\bedox\\Desktop\\Data gif generated\\gif_no_" + str(img) + ".mov", writer=writermov)
+    # writermov = animate.FFMpegWriter(fps=60)
+    ani2.save("C:\\Users\\bedox\\Desktop\\Data gif generated\\Patient_no_" + str(img+1) + ".gif")
     ax3.clear()
     ax1.clear()
     ax2.clear()

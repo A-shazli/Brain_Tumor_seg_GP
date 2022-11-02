@@ -69,24 +69,14 @@ class Logic(QtWidgets.QMainWindow):
         for i in range(self.input_image_data.shape[2]): #gets the number of slices to iterate
 
             im_sag = self.ui.axes1.imshow(rot(self.concate(self.input_image_data[i, :, :], self.input_seg_data[i, :, :]), angle=90), animated=True, cmap=plt.cm.gray)
-            self.images.append([im_sag])
-
             im_cor = self.ui.axes2.imshow(rot(self.concate(self.input_image_data[:, i, :], self.input_seg_data[:, i, :]), angle=90) , animated=True, cmap=plt.cm.gray)
-            self.images.append([im_cor])
-
             im_ax = self.ui.axes3.imshow(rot(self.concate(self.input_image_data[:, :, i], self.input_seg_data[:, :, i]), angle=90), animated=True, cmap=plt.cm.gray)
-            self.images.append([im_ax])
+            self.images.append([im_sag, im_cor, im_ax])
 
 
-
-
-
-
-        self.ani = animate.ArtistAnimation(self.ui.figure1, self.images, interval=15, \
+        self.ani = animate.ArtistAnimation(self.ui.figure1, self.images, interval=50, \
                                            blit=True, repeat_delay=500)
 
-        # writergif = animate.FFMpegWriter(fps=60)
-        # self.ani.save("ww.gif", writer=writergif)
 
         self.ui.canvas.draw()
 
