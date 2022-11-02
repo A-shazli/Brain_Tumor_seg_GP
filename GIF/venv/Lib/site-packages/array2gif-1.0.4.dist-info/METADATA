@@ -1,0 +1,166 @@
+Metadata-Version: 2.1
+Name: array2gif
+Version: 1.0.4
+Summary: Write a (list of) NumPy array(s) to an (animated) GIF.
+Home-page: https://github.com/tanyaschlusser/array2gif
+Author: Tanya Schlusser
+Author-email: tanya@tickel.net
+License: BSD
+Keywords: array2gif animated gif encoder numpy rgb
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering :: Visualization
+Requires-Dist: numpy
+
+Array2GIF: convert NumPy arrays to (animated) GIF
+=================================================
+
+
+ +-------------+--------------+--------------+
+ | |ising1|    + |ising2|     + |ising3|     +
+ | T = 0.7 T_c + T = 0.88 T_c + T = 1.06 T_c +
+ +-------------+--------------+--------------+
+
+
+Array2GIF provides a single top-level function, `write_gif()`, to
+write a 3-D NumPy array to a GIF, or a list of these arrays to an
+animated GIF.  It works for me - just small animations of thermodynamics
+simulations - like the magnetization in the Ising model shown here.
+
+
+Usage
+-----
+
+Here is an example for a 2 pixel by 3 pixel animated GIF with
+two frames, switching 5 frames per second. All animations from this
+library will loop indefinitely.
+
+
+.. code-block:: python
+
+    import numpy as np
+    from array2gif import write_gif
+
+    dataset = [
+        np.array([
+            [[255, 0, 0], [255, 0, 0]],  # red intensities
+            [[0, 255, 0], [0, 255, 0]],  # green intensities
+            [[0, 0, 255], [0, 0, 255]]   # blue intensities
+        ]),
+        np.array([
+            [[0, 0, 255], [0, 0, 255]],
+            [[0, 255, 0], [0, 255, 0]],
+            [[255, 0, 0], [255, 0, 0]]
+        ])
+    ]
+    write_gif(dataset, 'rgbbgr.gif', fps=5)
+
+    # or for just a still GIF
+    write_gif(dataset[0], 'rgb.gif')
+
+
+
+Installation
+------------
+
+Either: ::
+
+    pip install array2gif
+
+or: ::
+
+    pip install git+https://github.com/tanyaschlusser/array2gif.git#egg=array2gif
+
+
+
+.. _`the repository`: http://github.com/tanyaschlusser/array2gif
+.. |ising1| image:: https://tanyaschlusser.github.io/ising/img/ising_animation_1.6.gif
+   :scale: 200%
+   :width: 84px
+   :align: middle
+   :alt: Animation of random pixels converging from two colors to one color. T = 0.7 T_c.
+.. |ising2| image:: https://tanyaschlusser.github.io/ising/img/ising_animation_2.0.gif
+   :scale: 200%
+   :width: 84px
+   :align: middle
+   :alt: Animation of random pixels converging less slowly to one color. T = 0.88 T_c.
+.. |ising3| image:: https://tanyaschlusser.github.io/ising/img/ising_animation_2.4.gif
+   :scale: 200%
+   :width: 84px
+   :align: middle
+   :alt: Animation of random pixels staying mostly random. T = 1.06 T_c.
+
+
+.. :changelog:
+
+Release History
+---------------
+
+
+1.0.4 (2018-06-22)
+++++++++++++++++++
+
+**Bugfixes**
+
+- Fixed issue where error was raised when non-integer dataset
+  is used: instead now it is cast to `uint8` and a warning is
+  raised if there's a difference between the two images.
+
+- Addressed issue where no error is raised when there are
+  more colors than possible in a GIF (256 max). Although
+  it is possible to have a separate palette for every
+  single frame, this is not implemented right now, and
+  the initial global palette is used for the entire animation.
+
+1.0.3 (2018-06-02)
+++++++++++++++++++
+
+**Bugfixes**
+
+- Did not bump version in documentation last times.
+
+1.0.1 (2018-06-02)
+++++++++++++++++++
+
+**Bugfixes**
+
+- Fixed issue where the width and height of an image are swapped.
+  This is clear in image editors but was not obvious when viewed
+  in Chrome.
+
+
+1.0.0 (2018-05-23)
+++++++++++++++++++
+
+**Improvements**
+
+- It is now possible to use PIL ordering of data (rows x cols x rgb) 
+  in addition to the original ordering (rgb x rows x cols).
+
+**Bugfixes**
+
+- Fixed issue where array2gif would raise ``ValueError`` when using
+  a 4D NumPy array with perfectly valid data. Now it is possible to
+  use either a list of 3D NumPy arrays, or a 4D NumPy array for
+  animated gifs.
+
+
+0.1.0 (2016-09-30)
+++++++++++++++++++
+
+**Initial release**
+
+- One single function, ``write_gif``.
+
+

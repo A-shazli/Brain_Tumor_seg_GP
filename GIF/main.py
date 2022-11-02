@@ -47,7 +47,8 @@ class Logic(QtWidgets.QMainWindow):
                 input_seg = nib.load(path_seg)
                 self.input_seg_data = input_seg.get_fdata()
                 input_image_data = input_image.get_fdata()
-                self.input_image_data = self.scaler.fit_transform(input_image_data.reshape(-1, input_image_data.shape[-1])).reshape(input_image_data.shape)
+                self.input_image_data = self.scaler.fit_transform(input_image_data
+                    .reshape(-1, input_image_data.shape[-1])).reshape(input_image_data.shape)
 
                 print( self.input_image_data.max())
                 leN = self.input_image_data.shape[2] -1 #to avoid going out of bounds
@@ -56,7 +57,7 @@ class Logic(QtWidgets.QMainWindow):
                 self.ui.CoronalSlider.setMaximum(leN)
                 self.create_gif()
                 self.display_slice()
-                self.gif_img_mask(path)
+
 
     def create_gif(self):
 
@@ -81,7 +82,7 @@ class Logic(QtWidgets.QMainWindow):
 
 
 
-        self.ani = animate.ArtistAnimation(self.ui.figure1, self.images, interval=12, \
+        self.ani = animate.ArtistAnimation(self.ui.figure1, self.images, interval=15, \
                                            blit=True, repeat_delay=500)
 
         # writergif = animate.FFMpegWriter(fps=60)
@@ -110,14 +111,7 @@ class Logic(QtWidgets.QMainWindow):
         return image + seg * self.ui.opacity_slider.value()/10
 
 
-    def concate_2(self, image, seg):
 
-
-        # mult =  image * (seg)
-        #
-        # masked = image + mult
-        # mult = cv2.bitwise_or(image, seg)
-        return image + seg
 
     def pause_ani(self):
         del self.images
@@ -146,51 +140,7 @@ class Logic(QtWidgets.QMainWindow):
 
 
 
-    def gif_img_mask(self, path):
-        pa = ""
-        gif = []
-        path = path.split("/")
-        print(path)
-        for p in range(len(path) -2):
-            pa += path[p] + "/"
-        pa = pa[:-1]
-        print(pa)
-        t2_list = sorted(glob.glob(pa + '/*/*t2.nii.gz'))
-        t1ce_list = sorted(glob.glob(pa + '/*/*t1ce.nii.gz'))
-        flair_list = sorted(glob.glob(pa + '/*/*flair.nii.gz'))
-        mask_list = sorted(glob.glob(pa + '/*/*seg.nii.gz'))
-        fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
-        ax1.axis("off")
-        ax2.axis("off")
-        ax3.axis("off")
-        plt.style.use('dark_background')
-        fig.patch.set_facecolor('black')
-        print(len(t2_list))
 
-        for img in range(len(t2_list)):
-            temp_img = nib.load(t2_list[img]).get_fdata()
-            temp_img = self.scaler.fit_transform(temp_img.reshape(-1, temp_img.shape[-1])).reshape(temp_img.shape)
-            temp_seg = nib.load(mask_list[img]).get_fdata()
-            for i in range(temp_img.shape[2]):
-                im1 = ax1.imshow(self.concate_2(temp_img[:, :, i], temp_seg[:, :, i]), animated=True, cmap='gray')
-                gif.append([im1])
-                im2 = ax2.imshow(self.concate_2(temp_img[:, i, :], temp_seg[:, i, :]), animated=True, cmap='gray')
-                gif.append([im2])
-                im3 = ax3.imshow(self.concate_2(temp_img[i, :, :], temp_seg[i, :, :]), animated=True, cmap='gray')
-                gif.append([im3])
-            ani2 = animate.ArtistAnimation(fig, gif, interval=30, \
-                                          blit=True, repeat_delay=500)
-            writergif = animate.FFMpegWriter(fps=30)
-            ani2.save("C:\\Users\\bedox\\Desktop\\Data gif generated\\gif_no_" + str(img) + ".mov", writer=writergif)
-            gif.clear()
-            del temp_img
-            del temp_seg
-            gc.collect()
-        print("DONE")
-
-        # for subdir, dirs, files in os.walk(pa):
-        #     for file in files:
-        #         print(os.path.join(subdir, file))
 
 
 
