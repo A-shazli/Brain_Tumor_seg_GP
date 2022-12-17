@@ -131,12 +131,12 @@ def gif_gen():
             for s in range(temp_img.shape[0] - 1):
                 # Depending on the number of modes we generate the list of plots that will be used as frames
                 if len(all_modes) != 1:
-                    im1 = axs[curr, 0].imshow(rot(labeled_image[:, :, s, :], angle=90), animated=True)
+                    im1 = axs[curr, 0].imshow(rot(labeled_image[:, :, s, :], angle=270), animated=True)
                     im2 = axs[curr, 1].imshow(rot(labeled_image[:, s, :, :], angle=90), animated=True)
                     im3 = axs[curr, 2].imshow(rot(labeled_image[s, :, :, :], angle=90), animated=True)
                 else:
                     # In case only one mode was available since a fig of 1 x 3 is treated as a vector (1D)
-                    im1 = axs[0].imshow(rot(labeled_image[:, :, s, :], angle=90), animated=True)
+                    im1 = axs[0].imshow(rot(labeled_image[:, :, s, :], angle=270), animated=True)
                     im2 = axs[1].imshow(rot(labeled_image[:, s, :, :], angle=90), animated=True)
                     im3 = axs[2].imshow(rot(labeled_image[s, :, :, :], angle=90), animated=True)
 

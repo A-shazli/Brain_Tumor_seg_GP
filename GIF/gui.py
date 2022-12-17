@@ -9,6 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 from PyQt5.QtWidgets import QFileDialog
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -41,7 +42,7 @@ class Ui_MainWindow(object):
 
         self.labelAxial = QtWidgets.QLabel(self.centralwidget)
         self.labelAxial.setStyleSheet("font: 63 9pt \"Bahnschrift SemiBold\";")
-        self.labelAxial.setTextFormat(QtCore.Qt.MarkdownText)
+       # self.labelAxial.setTextFormat(QtCore.Qt.MarkdownText)
         self.labelAxial.setAlignment(QtCore.Qt.AlignCenter)
         self.labelAxial.setObjectName("labelAxial")
         self.verticalLayout.addWidget(self.labelAxial)
@@ -51,26 +52,16 @@ class Ui_MainWindow(object):
 
 
         self.figure1 = Figure()
-        self.axes1 = self.figure1.add_subplot(1, 3, 1)
-        self.axes2 = self.figure1.add_subplot(1, 3, 2)
-        self.axes3 = self.figure1.add_subplot(1, 3, 3)
+        self.axes1 = self.figure1.add_subplot(1, 1, 1)
         self.figure1.patch.set_facecolor("black")
         self.axes1.axis("off")
-        self.axes2.axis("off")
-        self.axes3.axis("off")
         self.canvas = FigureCanvas(self.figure1)
         self.canvas.setStyleSheet("background-color: rgb(239, 239, 239);")
-        self.opacity_slider = QtWidgets.QSlider(self.centralwidget)
-        self.opacity_slider.setOrientation(QtCore.Qt.Horizontal)
-        self.opacity_slider.setObjectName("opacity_slider")
-        self.verticalLayout_4.addWidget(self.opacity_slider)
-        self.opacity_slider.setMaximum(10)
-
         self.verticalLayout_4.addWidget(self.canvas)
 
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setStyleSheet("font: 63 9pt \"Bahnschrift SemiBold\";")
-        self.label.setTextFormat(QtCore.Qt.MarkdownText)
+        #self.label.setTextFormat(QtCore.Qt.MarkdownText)
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
         self.verticalLayout_4.addWidget(self.label)
@@ -93,7 +84,7 @@ class Ui_MainWindow(object):
 
         self.labelCoronal = QtWidgets.QLabel(self.centralwidget)
         self.labelCoronal.setStyleSheet("font: 63 9pt \"Bahnschrift SemiBold\";")
-        self.labelCoronal.setTextFormat(QtCore.Qt.MarkdownText)
+        #self.labelCoronal.setTextFormat(QtCore.Qt.MarkdownText)
         self.labelCoronal.setAlignment(QtCore.Qt.AlignCenter)
         self.labelCoronal.setObjectName("labelCoronal")
         self.verticalLayout_2.addWidget(self.labelCoronal)
@@ -115,7 +106,7 @@ class Ui_MainWindow(object):
 
         self.labelSagittal = QtWidgets.QLabel(self.centralwidget)
         self.labelSagittal.setStyleSheet("font: 63 9pt \"Bahnschrift SemiBold\";")
-        self.labelSagittal.setTextFormat(QtCore.Qt.MarkdownText)
+        #self.labelSagittal.setTextFormat(QtCore.Qt.MarkdownText)
         self.labelSagittal.setAlignment(QtCore.Qt.AlignCenter)
         self.labelSagittal.setObjectName("labelSagittal")
         self.verticalLayout_3.addWidget(self.labelSagittal)
